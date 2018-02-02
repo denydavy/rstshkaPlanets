@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="41376cba-6389-4ec8-a09d-f996a3ae379f" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/Jupiter/index.html" afterPath="$PROJECT_DIR$/Jupiter/index.html" />
-      <change beforePath="$PROJECT_DIR$/Mars/index.html" afterPath="$PROJECT_DIR$/Mars/index.html" />
-      <change beforePath="$PROJECT_DIR$/Mercury/index.html" afterPath="$PROJECT_DIR$/Mercury/index.html" />
-      <change beforePath="$PROJECT_DIR$/Neptune/index.html" afterPath="$PROJECT_DIR$/Neptune/index.html" />
-      <change beforePath="$PROJECT_DIR$/Saturn/index.html" afterPath="$PROJECT_DIR$/Saturn/index.html" />
-      <change beforePath="$PROJECT_DIR$/Uranus/index.html" afterPath="$PROJECT_DIR$/Uranus/index.html" />
+      <change beforePath="$PROJECT_DIR$/Venus/index.html" afterPath="$PROJECT_DIR$/Venus/index.html" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -22,7 +16,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Jupiter/index.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="125">
@@ -82,11 +76,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Venus/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="174">
-              <caret line="147" column="0" lean-forward="false" selection-start-line="147" selection-start-column="0" selection-end-line="148" selection-end-column="0" />
+            <state relative-caret-position="418">
+              <caret line="602" column="54" lean-forward="false" selection-start-line="602" selection-start-column="54" selection-end-line="602" selection-end-column="54" />
               <folding />
             </state>
           </provider>
@@ -106,6 +100,7 @@
       <find>СМОТРЕТЬ</find>
       <find>wrapper.de</find>
       <find>wrapper</find>
+      <find>rain</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -114,13 +109,13 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Venus/index.html" />
         <option value="$PROJECT_DIR$/Uranus/index.html" />
         <option value="$PROJECT_DIR$/Saturn/index.html" />
         <option value="$PROJECT_DIR$/Neptune/index.html" />
         <option value="$PROJECT_DIR$/Mercury/index.html" />
         <option value="$PROJECT_DIR$/Mars/index.html" />
         <option value="$PROJECT_DIR$/Jupiter/index.html" />
+        <option value="$PROJECT_DIR$/Venus/index.html" />
       </list>
     </option>
   </component>
@@ -205,12 +200,12 @@
       <option name="presentableId" value="Default" />
       <updated>1517579592117</updated>
       <workItem from="1517579593353" duration="4273000" />
-      <workItem from="1517586170643" duration="358000" />
+      <workItem from="1517586170643" duration="540000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4631000" />
+    <option name="totallyTimeSpent" value="4813000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="35" y="87" width="1862" height="973" extended-state="0" />
@@ -312,14 +307,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Venus/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="174">
-          <caret line="147" column="0" lean-forward="false" selection-start-line="147" selection-start-column="0" selection-end-line="148" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Uranus/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="299">
@@ -364,6 +351,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="125">
           <caret line="141" column="27" lean-forward="false" selection-start-line="141" selection-start-column="27" selection-end-line="141" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Venus/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="602" column="54" lean-forward="false" selection-start-line="602" selection-start-column="54" selection-end-line="602" selection-end-column="54" />
           <folding />
         </state>
       </provider>
