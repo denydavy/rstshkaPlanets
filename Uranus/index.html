@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Uranus</title>
+        <meta charset="utf-8">
+
+        <script src='three.min.js'></script>
+        <script src="Projector.js"></script>
+        <script src="DeviceOrientationControls.js"></script>
+        <script src="pixi.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.10/webfont.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenMax.min.js"></script>
+        <script src="https://cdn.webrtc-experiment.com/RecordRTC.js"></script>
+        <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+        <style>
+            @font-face {
+                font-family: src;
+                src: url('SansRoundedC.WOFF');
+            }
+
+            body {
+                margin: 0;
+            }
+
+            #al, #ar {
+                position: absolute;
+                z-index: 10;
+                top: 40vh;
+                width: 78px;
+                display: none;
+            }
+
+            #ar {
+                right: 14px;
+            }
+
+            #al {
+                left: 14px;
+            }
+
+
+            #sphere canvas {
+                z-index: 1;
+            }
+
+            #ui {
+                position: absolute;
+                top:0;
+                left:0;
+                z-index: 11;
+            }
+
+            #overlay {
+                position: absolute;
+                top:0;
+                left:0;
+                width:100%;
+                height:100%;
+                z-index: 2;
+            }
+
+            #lookaround {
+                width: 900px;
+                height: 520px;
+                background-image: url('bbl_bg_2.png');
+                background-repeat: no-repeat;
+                position: absolute;
+                bottom: 36px;
+                left: 34px;
+                background-size: cover;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 3;
+            }
+
+            #lookaround img {
+                position: absolute;
+                top: 120px;
+                left: 120px;
+            }
+
+            #lookaround span {
+                font-family: src;
+                font-size: 52px;
+                letter-spacing: -0.7px;
+                text-align: center;
+                color: #ffffff;
+                text-rendering: geometricPrecision;
+                font-weight: 600;
+            }
+
+            #lookat {
+                position: absolute;
+                top:0;
+                left:0;
+                width: 100%;
+                height: 100%;
+            }
+            #wrapper {
+                position:absolute;
+                bottom:0;
+                right:0;
+            }
+
+            #lookat_bubble {
+                width: 900px;
+                height: 495px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-image: url('bbl_bg_3.png');
+                background-size: cover;
+                position: absolute;
+                top: -420px;
+                right: 40px;
+            }
+
+            #lookat_btn {
+                position: absolute;
+                bottom:0;
+                right:0;
+                width:100%;
+            }
+
+            #lookat_bubble span {
+                font-family: src;
+                font-size: 66px;
+                letter-spacing: -0.7px;
+                text-align: center;
+                color: #ffffff;
+                text-rendering: geometricPrecision;
+            }
+
+            #lookat_sound_toggle {
+                position: absolute;
+                top: 120px;
+                left: 120px;
+                z-index: 10000;
+            }
+            @keyframes spin {
+                from {transform: rotate(0deg);}
+                to {transform: rotate(360deg);}
+            }
+        </style>
+    </head>
+    <body>
+    <div id="loader" style="background: white;position: absolute;top:0;left:0;z-index: 10000;width:100%;height:100%;">
+        <h1 style="color: #1761a4;text-align:center;font-family: src;font-size: 80px;margin-top: 30%;">Загрузка</h1>
+        <div id="pb" style="width: 300px;height:300px;border: 20px solid #1761a4;border-radius:50%;margin: 20% auto;border-left: none;border-top: none;border-right:none;animation: 1s spin linear infinite"></div>
+    </div>
+        <div id="sphere"></div>
+        <div id="ui"></div>
+        <img src="al.png" id="al">
+        <img src="ar.png" id="ar">
+        <audio src="uranus.wav" id="sound"></audio>
+        <div id="overlay">
+            <audio src="lookaround.wav" id="lookaround_sound"></audio>
+            <audio src="lookat.wav" id="lookat_sound"></audio>
+            <div id="lookaround">
+                <img id="lookaround_sound_toggle" src="sound_off.png" width="45">
+                <span>
+            Оглянись вокруг,<br>
+просто удивительно<br> как тут все<br> отличается от Земли!
+        </span>
+            </div>
+            <div id="lookat">
+                <div id="wrapper">
+                    <div id="lookat_bubble">
+                        <img id="lookat_sound_toggle" src="sound_off.png" width="45">
+                        <span>
+                    Эй, друг, смотри,<br>
+                    что здесь есть!
+                </span>
+                    </div>
+                    <img id="dino" src="dino_earth_2_closed.png" width="600">
+                </div>
+                <img id="lookat_btn" src="gobutton.png" >
+
+            </div>
+        </div>
+        <script>
+            var lookaround = document.querySelector('#lookaround_sound_toggle');
+            var lookat = document.querySelector("#lookat_sound_toggle");
+            var lookat_snd = document.querySelector("#lookat_sound");
+            var gobtn = document.querySelector("#lookat_btn");
+            var la_tml = new TimelineMax({paused: true});
+            var lat_tml = new TimelineMax({paused: true});
+            var anm = null;
+            lat_tml.from("#lookat",1,{opacity:0});
+
+
+            la_tml.from("#overlay", 1, {opacity:0, y: 700, ease:Elastic.easeOut.config(1, 0.3), onComplete: function(){
+                TweenMax.set("#overlay", {zIndex: 9999});
+                setTimeout(function(){
+                    TweenMax.to("#lookaround", 1, {opacity: 0, onComplete: function(){
+                        lat_tml.play();
+                        TweenMax.set("#lookaround", {display:"none"});
+                    }});
+                }, 10000);
+            }});
+
+
+            lookaround.addEventListener('click', toggle_lookaround_state().toggle_state);
+            lookat.addEventListener('click', toggle_lookat_state().toggle_state);
+            lookat_snd.addEventListener('play' , function(){
+                anm = setInterval(function(){
+                    kwak();
+                }, 100)
+            });
+
+            lookat_snd.addEventListener("pause", function(){
+                clearInterval(anm);
+                anm = null;
+            });
+
+            lookat_snd.addEventListener("ended", function(){
+                clearInterval(anm);
+                anm = null;
+            });
+
+            gobtn.addEventListener('click', function(){
+                location.href = "shazam://openzap?zid=ZWJa1c&campaign=danone";
+            });
+
+
+            function kwak(){
+                var d = document.querySelector("#dino");
+                d.src = d.src.match(/open\.png/) ? 'dino_earth_2_closed.png' : 'dino_earth_2_open.png';
+            }
+
+            function toggle_lookaround_state(){
+                var is_playing = false;
+                var ael = document.querySelector('#lookaround_sound');
+
+                function toggle_state(){
+                    console.log(is_playing);
+                    if(!is_playing){
+                        ael.play();
+                        is_playing = true;
+                        lookaround.src = 'sound_on.png';
+                    } else {
+                        ael.pause();
+                        is_playing = false;
+                        lookaround.src = 'sound_off.png';
+                    }
+                }
+                return  {
+                    toggle_state: toggle_state
+                }
+            }
+
+            function toggle_lookat_state(){
+                var is_playing = false;
+                var ael = document.querySelector('#lookat_sound');
+
+                function toggle_state(){
+                    if(!is_playing){
+                        ael.play();
+                        is_playing = true;
+                        lookat.src = 'sound_on.png';
+                    } else {
+                        ael.pause();
+                        is_playing = false;
+                        lookat.src = 'sound_off.png';
+                    }
+                }
+                return  {
+                    toggle_state: toggle_state
+                };
+            }
+
+
+
+            (function () {
+                function startRecording() {
+                    if (!microphone) {
+                        captureMicrophone(function (mic) {
+                            microphone = mic;
+                            if (isSafari) {
+                                // audio.muted = true;
+                                // setSrcObject(microphone, audio);
+                                // audio.play();
+                                console.log('Please click startRecording button again. First time we tried to access your microphone. Now we will record it.');
+                                return;
+                            }
+                        });
+                        return;
+                    }
+                    // audio.muted = true;
+                    // setSrcObject(microphone, audio);
+                    // audio.play();
+                    var options = {
+                        type: 'audio',
+                        recorderType: StereoAudioRecorder,
+                        desiredSampRate: 16000,
+                        // numberOfAudioChannels: isEdge ? 1 : 2,
+                        checkForInactiveTracks: true,
+                        bufferSize: 16384
+                    };
+                    if (navigator.platform && navigator.platform.toString().toLowerCase().indexOf('win') === -1) {
+                        options.sampleRate = 48000; // or 44100 or remove this line for default
+                    }
+                    if (recorder) {
+                        recorder.destroy();
+                        recorder = null;
+                    }
+                    recorder = RecordRTC(microphone, options);
+                    recorder.startRecording();
+                }
+
+                function captureMicrophone(callback) {
+                    if (microphone) {
+                        callback(microphone);
+                        return;
+                    }
+                    if (typeof navigator.mediaDevices === 'undefined' || !navigator.mediaDevices.getUserMedia) {
+                        console.log('This browser does not supports WebRTC getUserMedia API.');
+                        if (!!navigator.getUserMedia) {
+                            console.log('This browser seems supporting deprecated getUserMedia API.');
+                        }
+                    }
+                    navigator.mediaDevices.getUserMedia(
+                        {
+                            audio: isEdge ? true : {
+                                echoCancellation: false
+                            }
+                        }
+                    ).then(function (mic) {
+                        callback(mic);
+                    }).catch(function (error) {
+                        console.log('Unable to capture your microphone. Please check console logs.');
+                        console.error(error);
+                    });
+                }
+
+                function getFileName(fileExtension) {
+                    var d = new Date();
+                    var year = d.getFullYear();
+                    var month = d.getMonth();
+                    var date = d.getDate();
+                    return 'Record-' + year + month + date + '-' + getRandomString() + '.' + fileExtension;
+                }
+
+                function getRandomString() {
+                    if (window.crypto && window.crypto.getRandomValues && navigator.userAgent.indexOf('Safari') === -1) {
+                        var a = window.crypto.getRandomValues(new Uint32Array(3)),
+                            token = '';
+                        for (var i = 0, l = a.length; i < l; i++) {
+                            token += a[i].toString(36);
+                        }
+                        return token;
+                    } else {
+                        return (Math.random() * new Date().getTime()).toString(36).replace(/\./g, '');
+                    }
+                }
+
+                function stopRecordingCallback() {
+                    if (!recorder) return;
+
+                    var blob, file;
+
+                    var blp = new Promise(function (resolve, reject) {
+                        recorder.getDataURL(function (dataURL) {
+                            resolve(dataURL);
+                        });
+                    }).then(
+                        function (res) {
+                            blob = dataURItoBlob(res);
+                            file = new File([blob], getFileName('wav'), {
+                                type: 'audio/wav'
+                            });
+
+                            var rec_text = new Promise(function (resolve, reject) {
+                                resolve(sendToServer(blob));
+                            }).then(
+                                function (res) {
+                                    transform_rec_text(res);
+                                },
+                                function (err) {
+                                    console.log('error : ', err);
+                                    stage.removeChild(obj_pool[3]);
+                                    obj_pool[3].destroy();
+                                    obj_pool.pop();
+                                }
+                            );
+                        },
+                        function (err) {
+                            console.log(err);
+                        }
+                    );
+                }
+
+                function dataURItoBlob(dataURI) {
+                    // convert base64 to raw binary data held in a string
+                    // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+                    var byteString = atob(dataURI.split(',')[1]);
+
+                    // separate out the mime component
+                    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+                    // write the bytes of the string to an ArrayBuffer
+                    var ab = new ArrayBuffer(byteString.length);
+
+                    // create a view into the buffer
+                    var ia = new Uint8Array(ab);
+
+                    // set the bytes of the buffer to the correct values
+                    for (var i = 0; i < byteString.length; i++) {
+                        ia[i] = byteString.charCodeAt(i);
+                    }
+
+                    // write the ArrayBuffer to a blob, and you're done
+                    var blob = new Blob([ab], {type: mimeString});
+                    return blob;
+
+                }
+
+                function sendToServer(file) {
+                    return new Promise(function (resolve, reject) {
+                        var url = 'https://speech.kotbot.ru/upload'; //http://82.146.51.77:9999/upload';
+                        var xhr = new XMLHttpRequest();
+                        var fd = new FormData();
+                        xhr.responseType = 'json';
+                        xhr.open("POST", url, true);
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                // Every thing ok, file uploaded
+                                // resp = this.response;
+                                // console.log(resp.text); // handle response.
+                                resolve(this.response.text);
+                            } else if (xhr.status === 500) {
+                                // with some error
+                                console.log(this.response);
+                                reject(false);
+                            }
+                        };
+                        fd.append("uploadfile", file);
+                        xhr.send(fd);
+                    });
+                }
+
+                function transform_rec_text(rec_text) {
+                    console.log(rec_text);
+                    if (rec_text === 'да') {
+                        renderer.destroy();
+                        document.querySelector("#ar").style.display = "block";
+                        document.querySelector("#al").style.display = "block";
+                        la_tml.play();
+                    }
+                    else if (rec_text === 'нет') location.href = "https://brainrus.ru/selector";
+                    else build_norec_popup();
+                }
+
+                var isEdge = navigator.userAgent.indexOf('Edge') !== -1 && (!!navigator.msSaveOrOpenBlob || !!navigator.msSaveBlob);
+                var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                var recorder; // globally accessible
+                var microphone;
+                var WIDTH = window.innerWidth;
+                var HEIGHT = window.innerHeight;
+
+                var Application = PIXI.Application,
+                    loader = PIXI.loader,
+                    resources = PIXI.loader.resources,
+                    Sprite = PIXI.Sprite,
+                    Graphics = PIXI.Graphics;
+
+                var obj_pool = [];
+
+                loader.add('bg','bubble_bg.png')
+                    .add('yes', 'yes.png')
+                    .add('no', 'no.png')
+                    .add('d_open', 'dino_earth_open.png')
+                    .add('d_close', 'dino_earth_close.png')
+                    .add('dlg_bg', 'sp_bg.png')
+                    .add('ok', 'ok.png')
+                    .add('snd_on', 'sound_on.png')
+                    .add('snd_off', 'sound_off.png')
+                    .add("space_bg_1", "bg_space_1.png")
+                    .add("space_bg_2", "bg_space_2.png")
+                    .add("space_bg_3", "bg_space_3.png")
+                    .add("rocket", "dinorocket.png")
+                    .add("flame", "fire.png")
+                    .add("uranus_with_glow", "uranus_with_glow.png")
+                    .load(loadFonts);
+
+
+                function loadFonts() {
+                    // make sure fonts are loaded before we actually draw shit
+                    WebFont.load({
+                        custom: {
+                            families: ['src'],
+                            urls: ['fonts.css']
+                        },
+                        active: function (e) {
+                            console.log(e);
+                            build_flight_animation({name_en: 'uranus'});
+                        }
+                    });
+                }
+
+                var renderer = PIXI.autoDetectRenderer(WIDTH, HEIGHT, {transparent: true});
+                document.querySelector('#ui').appendChild(renderer.view);
+
+                var stage = new PIXI.Container();
+
+                function animate() {
+                    requestAnimationFrame(animate);
+
+                    renderer.render(stage);
+                }
+
+                animate();
+                function build_flight_animation(planetObj) {
+                    document.querySelector("#loader").style.display = "none";
+
+                    var wrapper = new PIXI.Container();
+                    var bg1 = new Sprite(loader.resources.space_bg_1.texture);
+                    var bg2 = new Sprite(loader.resources.space_bg_2.texture);
+                    var bg3 = new Sprite(loader.resources.space_bg_3.texture);
+                    var bg_wrapper = new PIXI.Container();
+
+                    var planet = new Sprite(loader.resources[planetObj.name_en + '_with_glow'].texture);
+                    var rocket_group = new PIXI.Container();
+                    var rocket = new Sprite(loader.resources.rocket.texture);
+                    var flame = new Sprite(loader.resources.flame.texture);
+
+                    bg_wrapper.addChild(bg1);
+                    bg_wrapper.addChild(bg2);
+                    bg_wrapper.addChild(bg3);
+
+                    bg1.scale.set(6, 6);
+                    bg2.scale.set(6, 6);
+                    bg3.scale.set(6, 6);
+                    bg2.position.set(0, 0);
+                    bg3.position.set(0, 0);
+
+
+                    planet.anchor.set(.5, .5);
+                    flame.scale.set(.3, .3);
+                    rocket.scale.set(.3, .3);
+                    planet.scale.set(.2, .2);
+
+                    planet.position.set((WIDTH - planet.width)/2 + 100, 320);
+                    bg_wrapper.position.set(0, 0);
+                    bg_wrapper.scale.set(.3, .3);
+                    rocket_group.addChild(flame);
+                    rocket_group.addChild(rocket);
+                    rocket_group.pivot.x = 1;
+                    rocket_group.pivot.y = 0;
+
+                    flame.position.set((rocket_group.width - flame.width) / 2, rocket_group.height - flame.height / 2.5);
+                    rocket_group.position.set(WIDTH - rocket_group.width, HEIGHT + rocket_group.height + 400);
+
+                    var flameTml = new TimelineMax({yoyo: true, repeat: -1});
+                    flameTml.to(flame.position, .4, {y: rocket_group.height - flame.height - 10});
+
+                    flameTml.play();
+
+                    var bgTml = new TimelineMax({repeat: -1, paused: true});
+                    bgTml.fromTo(bg_wrapper.children[2], 4, {y: -1600}, {y: 0, ease: Power0.easeNone});
+                    bgTml.fromTo(bg_wrapper.children[1], 4, {y: -1800}, {y: 0, ease: Power0.easeNone}, "-=4");
+
+
+                    var rocketTml = new TimelineMax();
+                    rocketTml.to(rocket_group.position, 2, {
+                        x: (WIDTH - rocket_group.width) / 2, y: HEIGHT/2.2, ease: Power4.easeOut,
+                        onComplete: function () {
+                            bgTml.play(0);
+                            rocketTml.to(planet.scale, 2, {x: 1.2, y: 1.2});
+                            rocketTml.to(rocket_group.position, 3, {y: -2200, x: WIDTH / 1.1, ease: Power4.easeIn}, "-=1");
+                            rocketTml.to(rocket_group, .4, {rotation: .5}, "-=1.4");
+                            rocketTml.to(rocket_group.skew, 1, {x: .1, y: -.1}, "-=2.5");
+                            rocketTml.to(rocket_group.scale, 2, {
+                                x: 0, y: 0.01, ease: Power2.easeOut, onComplete: function () {
+                                    wrapper.destroy();
+                                    setup();
+                                }
+                            }, "-=2.7");
+                        }
+                    });
+
+                    wrapper.addChild(bg_wrapper);
+                    wrapper.addChild(planet);
+                    wrapper.addChild(rocket_group);
+                    stage.addChild(wrapper);
+                }
+
+                function setup() {
+                    startRecording();
+
+                    var bg = new Graphics();
+                    bg.beginFill(0x000000, .7);
+                    bg.drawRect(0,0,WIDTH, HEIGHT);
+                    bg.endFill();
+
+                    var btn_g = new PIXI.Container();
+                    var btn_bg = new Graphics();
+
+                    btn_bg.beginFill(0x1761a4);
+                    btn_bg.drawRect(0,0, WIDTH, 150);
+                    btn_bg.endFill();
+
+                    var btn_s = new PIXI.TextStyle({
+                        fontFamily: "src",
+                        fontSize: 58,
+                        fill: "white"
+                    });
+
+                    var txt = new PIXI.Text('ГОВОРИ', btn_s);
+
+                    txt.position.set((btn_bg.width - txt.width)/2, (btn_bg.height - txt.height) / 2);
+                    btn_g.addChild(btn_bg);
+                    btn_g.addChild(txt);
+
+                    btn_g.position.set(0, HEIGHT - btn_g.height);
+
+
+                    var rocket = new Sprite(loader.resources.d_open.texture);
+                    rocket.scale.set(1.4);
+                    rocket.position.set(WIDTH-rocket.width,HEIGHT-rocket.height);
+
+                    var bubble_g = new PIXI.Container();
+                    var bub_bg = new Sprite(loader.resources.bg.texture);
+                    var yes_b = new Sprite(loader.resources.yes.texture);
+                    var no_b = new Sprite(loader.resources.no.texture);
+                    var bub_s = new PIXI.TextStyle({
+                        fontFamily: "src",
+                        fontSize: 40,
+                        fill: "white",
+                        align: 'center'
+                    });
+                    var bub_txt = new PIXI.Text("Привет, друг! \n" +
+                        "Мы на Уране!\n Показать тебе \n окрестности? Скажи \n" +
+                        "«ДА» или «НЕТ»", bub_s);
+                    var toggle_sound = new Sprite(loader.resources.snd_off.texture);
+
+                    bubble_g.addChild(bub_bg,yes_b,no_b,bub_txt,toggle_sound);
+
+                    bub_txt.position.set((bub_bg.width-bub_txt.width)/2, (bub_bg.height - bub_txt.height)/2-10);
+                    yes_b.position.set(50, bub_bg.height-70);
+                    no_b.position.set(yes_b.x+yes_b.width+20, yes_b.y);
+                    toggle_sound.position.set(bg.x + 90, bg.y+90);
+                    bubble_g.scale.set(1.4);
+                    bubble_g.position.set(WIDTH - bubble_g.width - 60, HEIGHT - rocket.height*1.4-190);
+
+                    stage.addChild(bg);
+                    stage.addChild(bubble_g);
+                    stage.addChild(rocket);
+                    stage.addChild(btn_g);
+
+                    btn_g.interactive = true;
+                    yes_b.interactive = true;
+                    no_b.interactive = true;
+                    toggle_sound.interactive = true;
+
+                    obj_pool.push(bubble_g);
+                    obj_pool.push(btn_g);
+                    obj_pool.push(rocket);
+
+                    var sndmngr = function(){
+                        var is_playing = false;
+
+                        function get_state(){
+                            return is_playing;
+                        }
+
+                        function toggle_state(){
+                            var ael = document.querySelector('#sound');
+
+                            if(!is_playing){
+                                ael.play();
+                                toggle_sound.setTexture(loader.resources.snd_on.texture);
+                                is_playing = true;
+                            } else {
+                                ael.pause();
+                                toggle_sound.setTexture(loader.resources.snd_off.texture);
+                                is_playing = false;
+                            }
+                        }
+
+                        return {
+                            get_state: get_state,
+                            toggle_state: toggle_state
+                        }
+                    };
+
+                    function kwak2(){
+                        var state = 'open';
+
+                        function swap(){
+                            rocket.setTexture(loader.resources['d_'+get_state()].texture);
+                        }
+
+                        function get_state() {
+                            state = state === 'open' ? 'close' : 'open';
+                            return state;
+                        }
+
+                        return {
+                            swap: swap
+                        }
+
+                    }
+                    var anm2 = null;
+                    var kwm = new kwak2();
+
+                    document.querySelector("#sound").addEventListener('play', function(){
+                        anm2 = setInterval(function(){ kwm.swap(); },100)
+                    });
+
+                    document.querySelector('#sound').addEventListener('pause', function(){
+                        clearInterval(anm2);
+                        anm2 = null;
+                    });
+
+                    document.querySelector('#sound').addEventListener('ended', function(){
+                        clearInterval(anm2);
+                        anm2 = null;
+                    });
+
+
+                    toggle_sound.on("tap", sndmngr().toggle_state);
+
+                    btn_g.on("pointerdown", function(){
+                        var popup = build_popup();
+                        bubble_g.visible = false;
+                        btn_g.visible = false;
+                        rocket.visible = false;
+
+                        popup.scale.set(1.4);
+                        popup.position.set((WIDTH - popup.width)/2, (HEIGHT - popup.height)/2);
+                        stage.addChild(popup);
+                        obj_pool.push(popup);
+                        startRecording();
+                        setTimeout(function(){
+//                    stage.removeChild(popup);
+                            if(recorder) {
+                                recorder.stopRecording(stopRecordingCallback);
+                            }
+                        }, 3000);
+                    });
+
+                    yes_b.on("pointerdown", function(){
+                        // Tween to opacity
+                        renderer.destroy();
+                        document.querySelector("#ar").style.display = "block";
+                        document.querySelector("#al").style.display = "block";
+                        la_tml.play();
+
+                    });
+
+                    no_b.on("pointerdown", function(){
+                        location.href = "https://brainrus.ru/selector";
+                    });
+
+                    var tml = new TimelineMax();
+                    tml.from(btn_g, .5, {x: -btn_g.width*1.4, ease: Power0.easeNone});
+                    tml.from(rocket.position, 1, {x: rocket.width * 1.4 + 250, ease: Power4.easeOut});
+                    tml.from(bubble_g, .5, {alpha:0, ease: Power4.easeInOut});
+                    animate();
+                }
+
+                function build_popup(){
+                    var wrapper = new PIXI.Container();
+
+                    var bg = new Sprite(loader.resources.dlg_bg.texture);
+                    var style = new PIXI.TextStyle({
+                        fontFamily: "src",
+                        fontSize: 45,
+                        fill: "#081d4a",
+                        align: 'center'
+                    });
+                    var txt = new PIXI.Text("СКАЖИ \n \u00ABДА\u00BB ИЛИ \u00ABНЕТ\u00BB", style);
+                    wrapper.addChild(bg,txt);
+
+                    var bw = new PIXI.Container();
+                    wrapper.addChild(bw);
+                    var c1 = draw_circle(0, 0, 15, 0x1761a4, 1);
+                    var c2 = draw_circle(40, 0, 15, 0x1761a4, .5);
+                    var c3 = draw_circle(80, 0, 15, 0x1761a4, .1);
+
+                    bw.addChild(c1);
+                    bw.addChild(c2);
+                    bw.addChild(c3);
+
+                    txt.position.set((bg.width - txt.width)/2, (bg.height - txt.height)/2-15);
+                    bw.position.set((bg.width - bw.width)/2 + 15, (bg.height - bw.height)/2 + 80);
+
+                    var tml = new TimelineMax({repeat: -1});
+                    tml.staggerTo(bw.children, .3, {y: -3}, .2);
+                    tml.staggerTo(bw.children, .3, {y: 0}, .2, "-=.2");
+                    return wrapper;
+                }
+
+                function draw_circle(x, y, r, f, a) {
+                    var c = new Graphics();
+
+                    c.beginFill(f, a);
+                    c.drawCircle(x, y, r);
+                    c.endFill();
+
+                    return c;
+                }
+
+                function build_norec_popup(){
+                    var wrapper = new PIXI.Container();
+
+                    var bg = new Sprite(loader.resources.dlg_bg.texture);
+                    var style = new PIXI.TextStyle({
+                        fontFamily: "src",
+                        fontSize: 42,
+                        fill: "#081d4a",
+                        align: 'center'
+                    });
+                    var txt = new PIXI.Text("УПС...\n ПОПРОБУЙ ЕЩЁ РАЗ!", style);
+                    var btn = new Sprite(loader.resources.ok.texture);
+
+                    wrapper.addChild(bg,txt,btn);
+
+                    txt.position.set((bg.width - txt.width)/2, (bg.height - txt.height)/2-15);
+                    btn.position.set((bg.width - btn.width)/2, (bg.y+bg.height-btn.height/2));
+
+                    btn.interactive = true;
+
+                    wrapper.scale.set(1.4);
+                    wrapper.position.set((WIDTH - wrapper.width)/2, (HEIGHT - wrapper.height)/2);
+
+                    btn.on("pointerdown", function(){
+                        console.log(obj_pool);
+                        obj_pool.map(function(t){
+                            t.visible = true;
+                        });
+
+                        obj_pool[0].children.map(function(t){
+                            t.intercative = true;
+                        });
+
+                        obj_pool[1].interactive = true;
+                        stage.removeChild(obj_pool[3]);
+                        obj_pool[3].destroy();
+                        obj_pool.pop();
+
+                        stage.removeChild(wrapper);
+                    });
+                    stage.addChild(wrapper);
+                    return wrapper;
+                }
+            })();
+
+        var el = document.querySelector('#sphere'),
+        isUserInteracting = false,
+        onMouseDownMouseX = 0, onMouseDownMouseY = 0,
+			lon = 90, onMouseDownLon = 0,
+			lat = 0, onMouseDownLat = 0,
+			phi = 0, theta = 0,
+			target = new THREE.Vector3();
+
+		var width  = window.innerWidth,
+			height = window.innerHeight;
+
+        var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera(75, width/height, .1, 1000);
+		camera.position.x = .1;
+		camera.position.y= -4;
+        
+
+        var llum = new THREE.DirectionalLight();
+        llum.intensity=50;
+
+
+        llum.position.x=camera.position.x;
+        llum.position.y=camera.position.y;
+        llum.position.z=camera.position.z;
+
+        llum.lookAt(scene.position);
+
+        scene.add(llum);
+
+        controls = new THREE.DeviceOrientationControls( camera );
+
+        var sphere = new THREE.SphereGeometry(110,110,40);
+        sphere.applyMatrix(new THREE.Matrix4().makeScale(-1,1,1));
+        var sphereMaterial = new THREE.MeshBasicMaterial();
+        var texture = new THREE.TextureLoader().load('Uran.jpg');
+        sphereMaterial.map = texture;
+
+        var sphereMesh = new THREE.Mesh(sphere, sphereMaterial);
+        
+        scene.add(sphereMesh);
+
+
+        var rocketPlane = new THREE.PlaneGeometry(5,15, 80);
+        var rocketMaterial = new THREE.MeshBasicMaterial({transparent:true});
+        var rocketTexture = new THREE.TextureLoader().load('Uran3.png');
+        rocketMaterial.map = rocketTexture;
+
+        var rocketMesh = new THREE.Mesh(rocketPlane, rocketMaterial);
+
+        rocketMesh.position.x = camera.position.x+5;
+        rocketMesh.position.y = camera.position.y-7;
+        rocketMesh.position.z = camera.position.z+10;
+        rocketMesh.rotation.y = 3.5;
+        
+
+        scene.add(rocketMesh);
+
+        var smPlane = new THREE.PlaneGeometry(10,14, 80);
+        var smMaterial = new THREE.MeshBasicMaterial({transparent:true});
+        var smTexture = new THREE.TextureLoader().load('Uran4.png');
+        smMaterial.map = smTexture;
+
+        var smMesh = new THREE.Mesh(smPlane, smMaterial);
+
+        smMesh.position.x = camera.position.x-8;
+        smMesh.position.y = camera.position.y-5;
+        smMesh.position.z = camera.position.z-10;
+        smMesh.rotation.y = .7;
+        
+
+        scene.add(smMesh);
+
+        var earth = new THREE.PlaneGeometry(5,5,10);
+        var earthMaterial = new THREE.MeshBasicMaterial({transparent:true});
+        var earthTexture = new THREE.TextureLoader().load('Uran2.png');
+        earthMaterial.map = earthTexture;
+
+        var earthMesh = new THREE.Mesh(earth, earthMaterial);
+
+        earthMesh.position.x = camera.position.x-2;
+        earthMesh.position.y = camera.position.y+12;
+        earthMesh.position.z = camera.position.z+20;
+        earthMesh.rotation.x = -.3;
+        earthMesh.rotation.y = -3.3;
+        
+
+        scene.add(earthMesh);
+        
+        
+
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio( window.devicePixelRatio );
+        // renderer.setSize( window.innerWidth, window.innerHeight );
+
+        renderer.setSize(width, height);
+        el.appendChild(renderer.domElement);
+
+        render();
+
+        function render() {
+			requestAnimationFrame(render);
+            // rain();
+            controls.update();  
+           // update();          
+			renderer.render(scene, camera);
+        }
+
+	//	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+        //document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+        //document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+        //document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+
+
+        function onDocumentMouseDown( event ) {
+
+            event.preventDefault();
+
+            isUserInteracting = true;
+
+            onPointerDownPointerX = event.clientX;
+            onPointerDownPointerY = event.clientY;
+
+            onPointerDownLon = lon;
+            onPointerDownLat = lat;
+        }
+
+        function onDocumentMouseMove( event ) {
+
+        if ( isUserInteracting === true ) {
+
+            lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
+            lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+
+        }
+
+        }
+
+        function onDocumentMouseUp( event ) {
+
+        isUserInteracting = false;
+
+        }
+
+        function onDocumentMouseWheel( event ) {
+
+        var fov = camera.fov + event.deltaY * 0.05;
+
+        camera.fov = THREE.Math.clamp( fov, 10, 75 );
+
+        camera.updateProjectionMatrix();
+
+        }
+
+
+        function onDocumentTouchStart( event ) {
+
+        if ( event.touches.length == 1 ) {
+
+            event.preventDefault();
+
+            onPointerDownPointerX = event.touches[ 0 ].pageX;
+            onPointerDownPointerY = event.touches[ 0 ].pageY;
+
+            onPointerDownLon = lon;
+            onPointerDownLat = lat;
+
+        }
+
+        }
+
+        function onDocumentTouchMove( event ) {
+
+        if ( event.touches.length == 1 ) {
+
+            event.preventDefault();
+
+            lon = ( onPointerDownPointerX - event.touches[0].pageX ) * 0.1 + onPointerDownLon;
+            lat = ( event.touches[0].pageY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+
+        }
+
+        }
+
+        function update() {
+
+            // if ( isUserInteracting === false ) {
+
+            //     lon += 0.1;
+
+            // }
+
+            lat = Math.max( - 85, Math.min( 85, lat ) );
+            phi = THREE.Math.degToRad( 90 - lat );
+            theta = THREE.Math.degToRad( lon );
+
+            target.x = 500 * Math.sin( phi ) * Math.cos( theta );
+            target.y = 500 * Math.cos( phi );
+            target.z = 500 * Math.sin( phi ) * Math.sin( theta );
+
+            camera.lookAt( target );
+
+            renderer.render( scene, camera );
+
+        }
+
+        </script>
+    </body>
+</html>
