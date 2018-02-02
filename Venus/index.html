@@ -115,11 +115,29 @@
                 right: 40px;
             }
 
+            #lookat_btn2 {
+                position: absolute;
+                bottom:0;
+                right:0;
+                width:100%;
+            }
+
             #lookat_btn {
                 position: absolute;
                 bottom:0;
                 right:0;
                 width:100%;
+                height:150px;
+                z-index: 2;
+                background: #1761a4;
+                color: white;
+                font-size: 66px;
+                font-weight: 600;
+                font-family: src;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-rendering: geometricPrecision;
             }
 
             #lookat_bubble span {
@@ -127,6 +145,7 @@
                 font-size: 66px;
                 letter-spacing: -0.7px;
                 text-align: center;
+                line-height: 1;
                 color: #ffffff;
                 text-rendering: geometricPrecision;
             }
@@ -141,6 +160,7 @@
                 from {transform: rotate(0deg);}
                 to {transform: rotate(360deg);}
             }
+
         </style>
     </head>
     <body>
@@ -174,15 +194,15 @@
                     </div>
                     <img id="dino" src="dino_earth_2_closed.png" width="600">
                 </div>
-                <img id="lookat_btn" src="gobutton.png" >
+                <div id="lookat_btn">СДЕЛАТЬ СЕЛФИ</div>
 
             </div>
         </div>
         <img id='rain' src='rain_1.png' style="position: absolute;top:0;left:0;width:100%;height:100%;z-index:3;display:none;"/>
 
         <script>
-            var lookaround = document.querySelector('#lookaround_sound_toggle');
-            var lookat = document.querySelector("#lookat_sound_toggle");
+            var lookaround = document.querySelector('#lookaround');
+            var lookat = document.querySelector("#lookat");
             var lookat_snd = document.querySelector("#lookat_sound");
             var gobtn = document.querySelector("#lookat_btn");
             var la_tml = new TimelineMax({paused: true});
@@ -240,11 +260,11 @@
                     if(!is_playing){
                         ael.play();
                         is_playing = true;
-                        lookaround.src = 'sound_on.png';
+                        document.querySelector('#lookaround_sound_toggle').src = 'sound_on.png';
                     } else {
                         ael.pause();
                         is_playing = false;
-                        lookaround.src = 'sound_off.png';
+                        document.querySelector('#lookaround_sound_toggle').src = 'sound_off.png';
                     }
                 }
                 return  {
@@ -260,11 +280,11 @@
                     if(!is_playing){
                         ael.play();
                         is_playing = true;
-                        lookat.src = 'sound_on.png';
+                        document.querySelector("#lookat_sound_toggle").src = 'sound_on.png';
                     } else {
                         ael.pause();
                         is_playing = false;
-                        lookat.src = 'sound_off.png';
+                        document.querySelector("#lookat_sound_toggle").src = 'sound_off.png';
                     }
                 }
                 return  {
@@ -576,8 +596,10 @@
                             rocketTml.to(rocket_group.skew, 1, {x: .1, y: -.1}, "-=2.5");
                             rocketTml.to(rocket_group.scale, 2, {
                                 x: 0, y: 0.01, ease: Power2.easeOut, onComplete: function () {
-                                    wrapper.destroy();
-                                    setup();
+                                    renderer.destroy();
+                                    document.querySelector("#ar").style.display = "block";
+                                    document.querySelector("#al").style.display = "block";
+                                    la_tml.play();
                                 }
                             }, "-=2.7");
                         }

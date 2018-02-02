@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="utf-8">
-
     <title>Jupiter</title>
     <script src='three.min.js'></script>
     <script src="Projector.js"></script>
@@ -118,9 +117,20 @@
 
         #lookat_btn {
             position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 100%;
+            bottom:0;
+            right:0;
+            width:100%;
+            height:150px;
+            z-index: 2;
+            background: #1761a4;
+            color: white;
+            font-size: 66px;
+            font-weight: 600;
+            font-family: src;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-rendering: geometricPrecision;
         }
 
         #lookat_bubble span {
@@ -141,6 +151,9 @@
         @keyframes spin {
             from {transform: rotate(0deg);}
             to {transform: rotate(360deg);}
+        }
+        span {
+            pointer-events: none;
         }
     </style>
 </head>
@@ -175,13 +188,14 @@
             </div>
             <img id="dino" src="dino_earth_2_closed.png" width="600">
         </div>
-        <img id="lookat_btn" src="gobutton.png">
+        <div id="lookat_btn">СДЕЛАТЬ СЕЛФИ</div>
+
 
     </div>
 </div>
 <script>
-    var lookaround = document.querySelector('#lookaround_sound_toggle');
-    var lookat = document.querySelector("#lookat_sound_toggle");
+    var lookaround = document.querySelector('#lookaround');
+    var lookat = document.querySelector("#lookat");
     var lookat_snd = document.querySelector("#lookat_sound");
     var gobtn = document.querySelector("#lookat_btn");
     var la_tml = new TimelineMax({paused: true});
@@ -233,49 +247,46 @@
         d.src = d.src.match(/open\.png/) ? 'dino_earth_2_closed.png' : 'dino_earth_2_open.png';
     }
 
-    function toggle_lookaround_state() {
+    function toggle_lookaround_state(){
         var is_playing = false;
         var ael = document.querySelector('#lookaround_sound');
 
-        function toggle_state() {
+        function toggle_state(){
             console.log(is_playing);
-            if (!is_playing) {
+            if(!is_playing){
                 ael.play();
                 is_playing = true;
-                lookaround.src = 'sound_on.png';
+                document.querySelector('#lookaround_sound_toggle').src = 'sound_on.png';
             } else {
                 ael.pause();
                 is_playing = false;
-                lookaround.src = 'sound_off.png';
+                document.querySelector('#lookaround_sound_toggle').src = 'sound_off.png';
             }
         }
-
-        return {
+        return  {
             toggle_state: toggle_state
         }
     }
 
-    function toggle_lookat_state() {
+    function toggle_lookat_state(){
         var is_playing = false;
         var ael = document.querySelector('#lookat_sound');
 
-        function toggle_state() {
-            if (!is_playing) {
+        function toggle_state(){
+            if(!is_playing){
                 ael.play();
                 is_playing = true;
-                lookat.src = 'sound_on.png';
+                document.querySelector("#lookat_sound_toggle").src = 'sound_on.png';
             } else {
                 ael.pause();
                 is_playing = false;
-                lookat.src = 'sound_off.png';
+                document.querySelector("#lookat_sound_toggle").src = 'sound_off.png';
             }
         }
-
-        return {
+        return  {
             toggle_state: toggle_state
         };
     }
-
 
     (function () {
         function startRecording() {
@@ -580,8 +591,10 @@
                     rocketTml.to(rocket_group.skew, 1, {x: .1, y: -.1}, "-=2.5");
                     rocketTml.to(rocket_group.scale, 2, {
                         x: 0, y: 0.01, ease: Power2.easeOut, onComplete: function () {
-                            wrapper.destroy();
-                            setup();
+                            renderer.destroy();
+                            document.querySelector("#ar").style.display = "block";
+                            document.querySelector("#al").style.display = "block";
+                            la_tml.play();
                         }
                     }, "-=2.7");
                 }
