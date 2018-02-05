@@ -20,7 +20,7 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Jupiter/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="125">
+            <state relative-caret-position="2115">
               <caret line="141" column="27" lean-forward="false" selection-start-line="141" selection-start-column="27" selection-end-line="141" selection-end-column="27" />
               <folding />
             </state>
@@ -30,8 +30,8 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Saturn/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="435">
-              <caret line="1074" column="0" lean-forward="true" selection-start-line="1074" selection-start-column="0" selection-end-line="1074" selection-end-column="0" />
+            <state relative-caret-position="-498">
+              <caret line="198" column="56" lean-forward="false" selection-start-line="198" selection-start-column="56" selection-end-line="198" selection-end-column="56" />
               <folding />
             </state>
           </provider>
@@ -80,7 +80,7 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Venus/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
+            <state relative-caret-position="9030">
               <caret line="602" column="54" lean-forward="false" selection-start-line="602" selection-start-column="54" selection-end-line="602" selection-end-column="54" />
               <folding />
             </state>
@@ -150,7 +150,6 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -167,6 +166,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -201,12 +201,13 @@
       <updated>1517579592117</updated>
       <workItem from="1517579593353" duration="4273000" />
       <workItem from="1517586170643" duration="1249000" />
-      <workItem from="1517837717154" duration="51000" />
+      <workItem from="1517837717154" duration="195000" />
+      <workItem from="1517837996732" duration="40000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5573000" />
+    <option name="totallyTimeSpent" value="5757000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1920" height="977" extended-state="6" />
@@ -242,6 +243,67 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/Jupiter/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2115">
+          <caret line="141" column="27" lean-forward="false" selection-start-line="141" selection-start-column="27" selection-end-line="141" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Mars/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2175">
+          <caret line="145" column="27" lean-forward="false" selection-start-line="145" selection-start-column="27" selection-end-line="145" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Mercury/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2130">
+          <caret line="142" column="31" lean-forward="false" selection-start-line="142" selection-start-column="31" selection-end-line="142" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Neptune/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2115">
+          <caret line="141" column="27" lean-forward="false" selection-start-line="141" selection-start-column="27" selection-end-line="141" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Uranus/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2115">
+          <caret line="141" column="31" lean-forward="false" selection-start-line="141" selection-start-column="31" selection-end-line="141" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Venus/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9030">
+          <caret line="602" column="54" lean-forward="false" selection-start-line="602" selection-start-column="54" selection-end-line="602" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Venus/gobutton.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Saturn/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="16110">
+          <caret line="1074" column="0" lean-forward="true" selection-start-line="1074" selection-start-column="0" selection-end-line="1074" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Jupiter/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2115">
@@ -403,7 +465,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Jupiter/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
+        <state relative-caret-position="2115">
           <caret line="141" column="27" lean-forward="false" selection-start-line="141" selection-start-column="27" selection-end-line="141" selection-end-column="27" />
           <folding />
         </state>
@@ -411,7 +473,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Venus/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
+        <state relative-caret-position="9030">
           <caret line="602" column="54" lean-forward="false" selection-start-line="602" selection-start-column="54" selection-end-line="602" selection-end-column="54" />
           <folding />
         </state>
@@ -419,8 +481,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Saturn/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="1074" column="0" lean-forward="true" selection-start-line="1074" selection-start-column="0" selection-end-line="1074" selection-end-column="0" />
+        <state relative-caret-position="-498">
+          <caret line="198" column="56" lean-forward="false" selection-start-line="198" selection-start-column="56" selection-end-line="198" selection-end-column="56" />
           <folding />
         </state>
       </provider>
