@@ -246,52 +246,25 @@
             d.src = d.src.match(/open\.png/) ? 'dino_earth_2_closed.png' : 'dino_earth_2_open.png';
         }
 
-        function toggle_lookaround_state() {
+        function toggle_lookat_state(){
             var is_playing = false;
-            var ael = document.querySelector('#lookaround_sound');
+            var ael = document.querySelector('#lookat_sound');
 
-            function toggle_lookaround_state() {
-                var is_playing = false;
-                var ael = document.querySelector('#lookaround_sound');
-
-                function toggle_state() {
-                    console.log(is_playing);
-                    if (!is_playing) {
-                        ael.play();
-                        is_playing = true;
-                        document.querySelector('#lookaround_sound_toggle').src = 'sound_on.png';
-                    } else {
-                        ael.pause();
-                        is_playing = false;
-                        document.querySelector('#lookaround_sound_toggle').src = 'sound_off.png';
-                    }
-                }
-
-                return {
-                    toggle_state: toggle_state
+            function toggle_state(){
+                if(!is_playing){
+                    ael.play();
+                    is_playing = true;
+                    document.querySelector("#lookat_sound_toggle").src = 'sound_on.png';
+                } else {
+                    ael.pause();
+                    is_playing = false;
+                    document.querySelector("#lookat_sound_toggle").src = 'sound_off.png';
                 }
             }
-
-            function toggle_lookat_state() {
-                var is_playing = false;
-                var ael = document.querySelector('#lookat_sound');
-
-                function toggle_state() {
-                    if (!is_playing) {
-                        ael.play();
-                        is_playing = true;
-                        document.querySelector("#lookat_sound_toggle").src = 'sound_on.png';
-                    } else {
-                        ael.pause();
-                        is_playing = false;
-                        document.querySelector("#lookat_sound_toggle").src = 'sound_off.png';
-                    }
-                }
-
-                return {
-                    toggle_state: toggle_state
-                };
-            }
+            return  {
+                toggle_state: toggle_state
+            };
+        }
 
             (function () {
                 function startRecording() {
